@@ -63,7 +63,7 @@ function _createBrowserWindowV2() {
 
         mainWindow.loadURL(
             isDev
-                ? 'http://localhost:3000'
+                ? 'http://127.0.0.1:3000'
                 : `file://${path.join(__dirname, '../build/index.html')}`
         );
     }
@@ -102,23 +102,8 @@ function createMainWindow(mainOpts) {
 
 
 function _setupNewWindowEvent(_window) {
-    // Listen to creating child window when it has a request from renderer process
-    // _window.webContents.on('-will-add-new-contents', (...args) => {
-    //     const [event, url] = args;
-
-    //     //   // Open extenal URL => Use configured onNewWindowCallback to handle the function outside
-    //     //   if (!this._isAllowedChildWindowUrl(url)) {
-    //     //     event.preventDefault();  
-    //     //     if (this.onNewWindowCallback) {
-    //     //       this.onNewWindowCallback(event, url);
-    //     //     }      
-    //     //   }
-    // })
     _window.webContents.on('new-window', (...args) => {
         const [event, url, frameName, disposition, options] = args;
-        // console.log('_setupNewWindowEvent>args: ', args);
-        // external URL had prevented in -will-add-new-contents
-        // if (this._isTrustedChildFrame(frameName)) {
         event.preventDefault();
         const position = { x: 100, y: 100 };
         prevPosition = position;
@@ -145,39 +130,16 @@ function _setupNewWindowEvent(_window) {
         childWindow = _createChilWindow(options, childURL, windowKey, sizeInfo);
         childWindow.webContents.openDevTools();
         event.newGuest = childWindow;
-    //     } else {
-    //         // Other cases
-    //         // Example: Open ads but the link is empty
-    //         // Avoid crash app when use Electron 7.x and turn on nativeWindowOpen
-    //         event.preventDefault();
-    //         let childWindow = new BrowserWindow(options);
-    //         console.log('child window2', childWindow.webPreferences);
-    //         this.instance.loadURL(url);
-    //         event.newGuest = childWindow;
-    //     }
     });
 }
 
 function _createChilWindow(opts, _url, windowKey, sizeInfo) {
     let childWindow = new BrowserWindow(opts);
-    // childWindow.loadURL(_url);
     console.log('_createChilWindow> ', opts);
-    // if (this.userAgent) {
-    //     childWindow.webContents.setUserAgent(this.userAgent);
-    // }
-
-    // if (this.isDev) {
-    //     // childWindow.webContents.openDevTools();
-    // }
 
     //register childWindow event
     _setupWindowEvent(childWindow, windowKey);
 
-    // configureContextMenu(childWindow);
-
-    // Attach key to childWindowKey
-    // this.childs[windowKey] = childWindow;
-    // this.childInfoSize[windowKey] = sizeInfo;
     return childWindow;
 }
 
@@ -196,38 +158,8 @@ function _setupWindowEvent(_window, windowKey) {
 }
 
 
-
-// function createWindow() {
-//   // Create the browser window.
-//   const win = new BrowserWindow({
-//     width: 800,
-//     height: 600,
-//     webPreferences: {
-//       nodeIntegration: true,
-//     },
-//   });
-
-//   // and load the index.html of the app.
-//   // win.loadFile("index.html");
-//   win.loadURL(
-//     isDev
-//       ? 'http://localhost:3000'
-//       : `file://${path.join(__dirname, '../build/index.html')}`
-//   );
-//   // Open the DevTools.
-//   if (isDev) {
-//     win.webContents.openDevTools();
-//   }
-// }
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(_createBrowserWindowV2);
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();

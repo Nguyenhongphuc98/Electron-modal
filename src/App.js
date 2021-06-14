@@ -15,7 +15,7 @@ function App() {
 	// });
 
 	const openChild = () => {
-		setChildWindow(window.open('http://localhost:3000/child.html', 'keyframe'));
+		setChildWindow(window.open('http://127.0.0.1:3000/child.html'));
 	}
 
 	return (
